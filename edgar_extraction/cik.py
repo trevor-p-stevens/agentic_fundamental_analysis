@@ -16,5 +16,5 @@ def get_cik(ticker: str):
     return None
 
 
-cik = get_cik("AAPL")
-print("CIK:", cik)
+# cik = get_cik("AAPL")
+# print("CIK:", cik)

@@ -1,0 +1,89 @@
+{
+  "revenue": [
+    "Revenues",
+    "Sales Revenue, Net",
+    "Revenue from Contract with Customer, Excluding Assessed Tax"
+  ],
+  "cogs": [
+    "Cost of Goods Sold",
+    "Cost of Revenue",
+    "Cost of Goods and Services Sold"
+  ],
+  "gross_profit": [
+    "Gross Profit"
+  ],
+  "operating_income": [
+    "Operating Income (Loss)",
+    "Income from Operations"
+  ],
+  "interest_expense": [
+    "Interest Expense"
+  ],
+  "pretax_income": [
+    "Income (Loss) from Continuing Operations before Income Taxes, Extraordinary Items, Noncontrolling Interest",
+    "Income (Loss) from Continuing Operations before Income Taxes, Noncontrolling Interest"
+  ],
+  "tax_expense": [
+    "Income Tax Expense (Benefit)"
+  ],
+  "net_income": [
+    "Net Income (Loss)",
+    "Profit (Loss)",
+    "Net Income (Loss) Attributable to Parent"
+  ],
+  "depreciation_amortization": [
+    "Depreciation, Depletion and Amortization"
+  ],
+  "eps_diluted": [
+    "Earnings Per Share, Diluted"
+  ],
+  "shares_diluted": [
+    "Weighted Average Number of Diluted Shares Outstanding",
+    "Weighted Average Number of Shares Outstanding, Diluted"
+  ],
+  "cash": [
+    "Cash and Cash Equivalents, at Carrying Value",
+    "Cash, Cash Equivalents, Restricted Cash and Restricted Cash Equivalents"
+  ],
+  "short_term_investments": [
+    "Short-Term Investments",
+    "Marketable Securities, Current"
+  ],
+  "accounts_receivable": [
+    "Accounts Receivable, Net, Current",
+    "Accounts Receivable, after Allowance for Credit Loss, Current"
+  ],
+  "inventory": [
+    "Inventory, Net"
+  ],
+  "current_assets": [
+    "Assets, Current"
+  ],
+  "total_assets": [
+    "Assets"
+  ],
+  "accounts_payable": [
+    "Accounts Payable, Current"
+  ],
+  "current_liabilities": [
+    "Liabilities, Current"
+  ],
+  "total_debt": [
+    "Long-Term Debt",
+    "Long-Term Debt, Noncurrent",
+    "Long-term Debt, Gross",
+    "Long-term Debt"
+  ],
+  "shareholders_equity": [
+    "Stockholders' Equity",
+    "Stockholders' Equity Including Portion Attributable to Noncontrolling Interest",
+    "Stockholders' Equity Attributable to Parent"
+  ],
+  "operating_cash_flow": [
+    "Net Cash Provided by (Used in) Operating Activities"
+  ],
+  "capex": [
+    "Payments to Acquire Property, Plant, and Equipment",
+    "Capital Expenditures"
+  ]
+}
