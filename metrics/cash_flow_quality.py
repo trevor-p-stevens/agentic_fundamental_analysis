@@ -1,37 +1,30 @@
-def calculate_cash_flow_quality(metrics):
-    operating_cash_flow = metrics.get("operating_cash_flow")
-    capital_expenditures = metrics.get("capex")
-    revenue = metrics.get("revenue")
-    net_income = metrics.get("net_income")
-    current_liabilities = metrics.get("current_liabilities")
+import pandas as pd
 
-    def safe_div(n, d):
-        try:
-            return n / d if n is not None and d not in (None, 0) else None
-        except Exception:
-            return None
+
+def calculate_cash_flow_quality_metrics(df):
+    """
+    Expects a DataFrame with columns:
+    'operating_cash_flow', 'capex', 'revenue', 'net_income', 'current_liabilities'
+    Returns a DataFrame with new cash flow quality metrics as columns.
+    """
+    result = pd.DataFrame(index=df.index)
 
     # Free Cash Flow (FCF)
-    fcf = None
-    if operating_cash_flow is not None and capital_expenditures is not None:
-        fcf = operating_cash_flow - capital_expenditures
+    result["free_cash_flow"] = df["operating_cash_flow"] - df["capex"]
 
     # FCF Margin
-    fcf_margin = safe_div(fcf, revenue) if fcf is not None else None
+    result["fcf_margin"] = result["free_cash_flow"] / df["revenue"]
 
     # FCF Conversion
-    fcf_conversion = safe_div(fcf, net_income) if fcf is not None else None
+    result["fcf_conversion"] = result["free_cash_flow"] / df["net_income"]
 
     # Capex Intensity
-    capex_intensity = safe_div(capital_expenditures, revenue)
+    result["capex_intensity"] = df["capex"] / df["revenue"]
 
     # Operating Cash Flow Ratio
-    ocf_ratio = safe_div(operating_cash_flow, current_liabilities)
+    result["operating_cash_flow_ratio"] = df["operating_cash_flow"] / df["current_liabilities"]
+    
+    # Optionally, replace inf with NaN (e.g., division by zero)
+    result = result.replace([float('inf'), float('-inf')], pd.NA)
 
-    return {
-        "free_cash_flow": fcf,
-        "fcf_margin": fcf_margin,
-        "fcf_conversion": fcf_conversion,
-        "capex_intensity": capex_intensity,
-        "operating_cash_flow_ratio": ocf_ratio
-    }
+    return result

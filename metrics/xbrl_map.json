@@ -85,5 +85,42 @@
   "capex": [
     "Payments to Acquire Property, Plant, and Equipment",
     "Capital Expenditures"
+  ],
+  "research_development_expense": [
+    "Research and Development Expense",
+    "Research and Development Expense, Excluding Acquired in Process Cost"
+  ],
+  "sga_expense": [
+    "Selling, General and Administrative Expense"
+  ],
+  "operating_lease_expense": [
+    "Operating Lease, Cost",
+    "Lease and Rental Expense"
+  ],
+  "sbc": [
+    "Share-based Compensation",
+    "Share-Based Payment Arrangement, Noncash Expense",
+    "Share-based Payment Arrangement, Expense"
+  ],
+  "buybacks": [
+    "Payments for Repurchase of Common Stock",
+    "Treasury Stock, Value, Acquired, Cost Method"
+  ],
+  "dividends_paid": [
+    "Payments of Dividends",
+    "Payments of Ordinary Dividends, Common Stock"
+  ],
+  "shares_issued_sbc": [
+    "Stock Issued During Period, Value, Restricted Stock Award, Gross",
+    "Proceeds from Stock Options Exercised",
+    "Incremental Common Shares Attributable to Dilutive Effect of Share-based Payment Arrangements",
+    "Weighted Average Number Diluted Shares Outstanding Adjustment"
+  ],
+  "oci": [
+    "Other Comprehensive Income (Loss), Net of Tax",
+    "Comprehensive Income (Loss), Net of Tax, Attributable to Parent"
+  ],
+  "retained_earnings": [
+    "Retained Earnings (Accumulated Deficit)"
   ]
 }

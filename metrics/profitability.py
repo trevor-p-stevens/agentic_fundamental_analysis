@@ -1,69 +1,50 @@
-def calculate_profitability(metrics):
-    # Required values (should be floats, not None)
-    revenue = metrics.get("revenue")
-    cogs = metrics.get("cogs")
-    operating_income = metrics.get("operating_income")
-    net_income = metrics.get("net_income")
-    shareholders_equity = metrics.get("shareholders_equity")
-    total_assets = metrics.get("total_assets")
-    total_debt = metrics.get("total_debt")
-    cash = metrics.get("cash")
-    depreciation_amortization = metrics.get("depreciation_amortization")
-    income_tax_expense = metrics.get("tax_expense")
-    pretax_income = metrics.get("pretax_income")
+import pandas as pd
 
-    # Defensive: avoid division by zero or None
-    def safe_div(n, d):
-        try:
-            return n / d if n is not None and d not in (None, 0) else None
-        except Exception:
-            return None
+def calculate_profitability_metrics(df):
+    """
+    Expects a DataFrame with columns:
+    'revenue', 'cogs', 'operating_income', 'net_income', 'shareholders_equity',
+    'total_assets', 'total_debt', 'cash', 'depreciation_amortization',
+    'tax_expense', 'pretax_income'
+    Returns a DataFrame with profitability metrics as columns.
+    Handles missing or null values gracefully.
+    """
+    result = pd.DataFrame(index=df.index)
 
     # Gross Margin
-    gross_margin = safe_div(revenue - cogs, revenue) if revenue and cogs is not None else None
+    result["gross_margin"] = (df["revenue"] - df["cogs"]) / df["revenue"]
 
     # Operating Margin
-    operating_margin = safe_div(operating_income, revenue)
+    result["operating_margin"] = df["operating_income"] / df["revenue"]
 
     # Net Margin
-    net_margin = safe_div(net_income, revenue)
+    result["net_margin"] = df["net_income"] / df["revenue"]
 
     # Return on Equity (ROE)
-    roe = safe_div(net_income, shareholders_equity)
+    result["roe"] = df["net_income"] / df["shareholders_equity"]
 
     # Return on Assets (ROA)
-    roa = safe_div(net_income, total_assets)
+    result["roa"] = df["net_income"] / df["total_assets"]
 
     # Tax Rate
-    tax_rate = safe_div(income_tax_expense, pretax_income)
+    result["tax_rate"] = df["tax_expense"] / df["pretax_income"]
 
     # NOPAT (Net Operating Profit After Tax)
-    nopat = operating_income * (1 - tax_rate) if operating_income is not None and tax_rate is not None else None
+    result["nopat"] = df["operating_income"] * (1 - result["tax_rate"])
 
     # Invested Capital
-    invested_capital = None
-    if shareholders_equity is not None and total_debt is not None and cash is not None:
-        invested_capital = shareholders_equity + total_debt - cash
+    result["invested_capital"] = df["shareholders_equity"] + df["total_debt"] - df["cash"]
 
     # ROIC
-    roic = safe_div(nopat, invested_capital) if nopat is not None and invested_capital else None
+    result["roic"] = result["nopat"] / result["invested_capital"]
 
-    # EBITDA and EBITDA Margin
-    ebitda = None
-    if operating_income is not None and depreciation_amortization is not None:
-        ebitda = operating_income + depreciation_amortization
-    ebitda_margin = safe_div(ebitda, revenue) if ebitda is not None else None
+    # EBITDA
+    result["ebitda"] = df["operating_income"] + df["depreciation_amortization"]
 
-    return {
-        "gross_margin": gross_margin,
-        "operating_margin": operating_margin,
-        "net_margin": net_margin,
-        "roe": roe,
-        "roa": roa,
-        "roic": roic,
-        "ebitda": ebitda,
-        "ebitda_margin": ebitda_margin,
-        "tax_rate": tax_rate,
-        "nopat": nopat,
-        "invested_capital": invested_capital
-    }
+    # EBITDA Margin
+    result["ebitda_margin"] = result["ebitda"] / df["revenue"]
+
+    # Replace inf/-inf with NaN for safe output
+    result = result.replace([float('inf'), float('-inf')], pd.NA)
+
+    return result

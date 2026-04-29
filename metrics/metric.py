@@ -18,7 +18,8 @@ def build_master_metrics(us_gaap_10k_list, us_gaap_10q_list, cik, accession_numb
                 )
                 if entries:
                     master[metric].extend(entries)
-        # Deduplicate and sort by period_end descending
+                else:
+                    master[metric].append({"period_end": None, "value": None})        # Deduplicate and sort by period_end descending
         for metric in master:
             seen = set()
             unique_entries = []
@@ -27,7 +28,7 @@ def build_master_metrics(us_gaap_10k_list, us_gaap_10q_list, cik, accession_numb
                 if pe not in seen:
                     unique_entries.append(entry)
                     seen.add(pe)
-            unique_entries.sort(key=lambda x: x["period_end"], reverse=True)
+            unique_entries.sort(key=lambda x: (x["period_end"] is not None, x["period_end"]), reverse=True)
             master[metric] = unique_entries
         return master
 

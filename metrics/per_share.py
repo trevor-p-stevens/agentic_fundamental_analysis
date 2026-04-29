@@ -1,24 +1,34 @@
-def calculate_per_share_metrics(metrics):
-    net_income = metrics.get("net_income")
-    shareholders_equity = metrics.get("shareholders_equity")
-    revenue = metrics.get("revenue")
-    fcf = metrics.get("free_cash_flow")  # Should be calculated elsewhere and passed in
-    diluted_shares = metrics.get("shares_diluted")
+import pandas as pd
 
-    def safe_div(n, d):
-        try:
-            return n / d if n is not None and d not in (None, 0) else None
-        except Exception:
-            return None
+def calculate_per_share_metrics(df):
+    """
+    Expects a DataFrame with columns:
+    'net_income', 'shareholders_equity', 'revenue', 'shares_diluted',
+    and either 'free_cash_flow' or both 'operating_cash_flow' and 'capex'.
+    """
+    result = pd.DataFrame(index=df.index)
 
-    eps_diluted = safe_div(net_income, diluted_shares)
-    bvps = safe_div(shareholders_equity, diluted_shares)
-    fcf_per_share = safe_div(fcf, diluted_shares)
-    rps = safe_div(revenue, diluted_shares)
+    # Compute free cash flow if not present
+    if "free_cash_flow" in df.columns:
+        fcf = df["free_cash_flow"]
+    elif "operating_cash_flow" in df.columns and "capex" in df.columns:
+        fcf = df["operating_cash_flow"] - df["capex"]
+    else:
+        fcf = pd.Series([pd.NA] * len(df), index=df.index)
 
-    return {
-        "eps_diluted": eps_diluted,
-        "book_value_per_share": bvps,
-        "fcf_per_share": fcf_per_share,
-        "revenue_per_share": rps
-    }
+    # EPS (Diluted)
+    result["eps_diluted"] = df["net_income"] / df["shares_diluted"]
+
+    # Book Value Per Share
+    result["book_value_per_share"] = df["shareholders_equity"] / df["shares_diluted"]
+
+    # Free Cash Flow Per Share
+    result["fcf_per_share"] = fcf / df["shares_diluted"]
+
+    # Revenue Per Share
+    result["revenue_per_share"] = df["revenue"] / df["shares_diluted"]
+
+    # Replace inf/-inf with NaN for safe output
+    result = result.replace([float('inf'), float('-inf')], pd.NA)
+
+    return result

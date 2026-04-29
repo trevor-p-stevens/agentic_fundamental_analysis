@@ -3,3 +3,5 @@
 !xbrl_map.json
 *.txt
 *.pyc
+*.pdf
+*.csv

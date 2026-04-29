@@ -1,33 +1,24 @@
-def calculate_liquidity(metrics):
-    current_assets = metrics.get("current_assets")
-    current_liabilities = metrics.get("current_liabilities")
-    inventory = metrics.get("inventory")
-    cash = metrics.get("cash")
-    short_term_investments = metrics.get("short_term_investments")
+import pandas as pd
 
-    def safe_div(n, d):
-        try:
-            return n / d if n is not None and d not in (None, 0) else None
-        except Exception:
-            return None
+def calculate_liquidity_metrics(df):
+    """
+    Expects a DataFrame with columns:
+    'current_assets', 'current_liabilities', 'inventory', 'cash', 'short_term_investments'
+    Returns a DataFrame with liquidity metrics as columns.
+    Handles missing or null values gracefully.
+    """
+    result = pd.DataFrame(index=df.index)
 
     # Current Ratio
-    current_ratio = safe_div(current_assets, current_liabilities)
+    result["current_ratio"] = df["current_assets"] / df["current_liabilities"]
 
     # Quick Ratio
-    quick_ratio = safe_div(
-        current_assets - inventory if current_assets is not None and inventory is not None else None,
-        current_liabilities
-    )
+    result["quick_ratio"] = (df["current_assets"] - df["inventory"]) / df["current_liabilities"]
 
     # Cash Ratio
-    cash_ratio = safe_div(
-        (cash if cash is not None else 0) + (short_term_investments if short_term_investments is not None else 0),
-        current_liabilities
-    )
+    result["cash_ratio"] = (df["cash"].fillna(0) + df["short_term_investments"].fillna(0)) / df["current_liabilities"]
 
-    return {
-        "current_ratio": current_ratio,
-        "quick_ratio": quick_ratio,
-        "cash_ratio": cash_ratio
-    }
+    # Replace inf/-inf with NaN for safe output
+    result = result.replace([float('inf'), float('-inf')], pd.NA)
+
+    return result
