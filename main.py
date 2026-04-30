@@ -5,6 +5,7 @@ from edgar_extraction.get_filings import get_filing_accessions_primary_docs, get
 from edgar_extraction.xbrl import get_us_gaap, get_xbrl
 from metrics.evaluate_metrics import basic_forecast, build_dataframe, business_quality_score, eval_metrics
 from metrics.metric import build_master_metrics
+from metrics.metrics_json import canonical_metrics_json
 from metrics.xbrl_map import get_metric_value
 
 
@@ -57,3 +58,7 @@ with open("business_quality_score_log.txt", "w") as f:
 forecast_df = basic_forecast(all_metrics_annual, years_ahead=3)
 print(forecast_df)
 forecast_df.to_csv("forecast_scenarios.csv", index=False)
+
+final_json = canonical_metrics_json(all_metrics_annual)
+with open("final_json.json", 'w') as f:
+    json.dump(final_json, f, indent=2)

@@ -179,7 +179,32 @@ def eval_metrics(df: pd.DataFrame, freq: str = "auto", ticker: str = None) -> pd
     trend_df = trend_detection_layer(result)
     result = pd.concat([result, trend_df], axis=1)
 
+    result = group_metric_columns(result)
+
     return result
+
+def group_metric_columns(df):
+    # Extract base names (before first underscore) for all columns
+    from collections import defaultdict
+    import re
+
+    # Build a mapping from base metric to all columns starting with that base
+    groups = defaultdict(list)
+    for col in df.columns:
+        # Match base metric (e.g., revenue, gross_margin, etc.)
+        base = re.match(r"([a-zA-Z0-9]+)", col)
+        if base:
+            groups[base.group(1)].append(col)
+        else:
+            groups[col].append(col)
+
+    # Flatten the grouped columns in order
+    ordered_cols = []
+    for base in sorted(groups.keys()):
+        ordered_cols.extend(sorted(groups[base]))
+
+    # Reindex DataFrame columns
+    return df[ordered_cols]
 
 def get_scalar(val):
     if isinstance(val, (pd.Series, np.ndarray)):
