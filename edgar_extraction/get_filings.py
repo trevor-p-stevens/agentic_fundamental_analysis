@@ -3,6 +3,14 @@ from edgar_extraction.cik import HEADERS
 from bs4 import BeautifulSoup
 import re
 
+SECTION_GENERAL_MAP = {
+    "1": "Item 1",
+    "1A": "Item 1A",
+    "7": "Item 7",
+    "8": "Item 8",
+}
+
+
 def get_filing_accessions_primary_docs(cik):
     url = f"https://data.sec.gov/submissions/CIK{cik}.json"
     data = requests.get(url, headers=HEADERS).json()
@@ -52,6 +60,13 @@ def clean_text(text):
     text = re.sub(r' +', ' ', text)
     return text
 
+def generalize_section_key(key):
+    # Match "Item 1", "Item 1A", "Item 7", "Item 8" at the start, with optional punctuation/words after
+    m = re.match(r"Item\s*(1A|1|7|8)\b", key, re.IGNORECASE)
+    if m:
+        return f"Item {m.group(1).upper()}"
+    return None  # Ignore sections that don't match
+
 def parse_filing(html: str, form_type="10-K") -> dict[str, str]:
     soup = BeautifulSoup(html, "lxml")
 
@@ -67,8 +82,6 @@ def parse_filing(html: str, form_type="10-K") -> dict[str, str]:
 
     raw = soup.get_text(separator="\n", strip=True)
     raw = re.sub(r'\n{3,}', '\n\n', raw)
-
-    # Clean unwanted symbols and footers
     raw = clean_text(raw)
 
     pattern = r'(?=^Item\s+\d+[A-Za-z]?[\s\.\-—])'
@@ -80,37 +93,17 @@ def parse_filing(html: str, form_type="10-K") -> dict[str, str]:
             continue
         first_line = part.split('\n')[0].strip()
         norm_key = normalize_section_key(first_line)
-        sections[norm_key] = part.strip()
+        gen_key = generalize_section_key(norm_key)
+        if gen_key:
+            if gen_key not in sections:
+                sections[gen_key] = part.strip()
+            else:
+                # Concatenate if multiple parts for the same section
+                sections[gen_key] += "\n\n" + part.strip()
 
+    # Optionally filter out very short sections
     sections = {k: v for k, v in sections.items() if len(v) > 300}
-
-    # Looser keep patterns for 10-K and 10-Q
-    if form_type == "10-K":
-        keep_patterns = [
-            r'Item\s*1[^0-9A-Za-z]*Business',
-            r'Item\s*1A[^0-9A-Za-z]*Risk Factors',
-            r'Item\s*7[^0-9A-Za-z]*Management',
-            r'Item\s*7A[^0-9A-Za-z]*Quantitative',
-            r'Item\s*8[^0-9A-Za-z]*Financial Statements',
-        ]
-    elif form_type == "10-Q":
-        keep_patterns = [
-            r'Item\s*1[^0-9A-Za-z]*Financial Statements',
-            r'Item\s*2[^0-9A-Za-z]*Management',
-            r'Item\s*3[^0-9A-Za-z]*Quantitative',
-            r'Item\s*1A[^0-9A-Za-z]*Risk Factors',
-        ]
-    else:
-        keep_patterns = []
-
-    filtered = {}
-    for k, v in sections.items():
-        for pat in keep_patterns:
-            if re.search(pat, k, re.IGNORECASE):
-                filtered[k] = v
-                break
-
-    return filtered
+    return sections
 
 def get_filing_html_text(cik, accession, primary_doc, form_type):
     accession_clean = accession.replace("-", "")
